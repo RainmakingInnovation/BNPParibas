@@ -485,7 +485,7 @@
       }
 
       #button-16 .knobs:before {
-        content: "Maturity";
+        content: "Year";
         position: absolute;
         top: 4px;
         left: 4px;
@@ -545,7 +545,7 @@
       }
 
       #button-16 .checkbox:checked + .knobs:before {
-        content: "Year";
+        content: "Maturity";
         left: 56px;
         background-color: #ea3b66;
       }
@@ -1439,8 +1439,8 @@
           height = 860,
           innerRadius = 50,
           outerRadius = 300,
-          nodeRadius = 2.6,
-          nodeOtherWidth = 5.5,
+          nodeRadius = 3.6,
+          nodeOtherWidth = 7.0,
           keySize = 10,
           keySpacing = 10,
           radial = "year",
@@ -1452,7 +1452,7 @@
           clientFilter = "All Startups",
           geoFilter = "All Startups",
           filters = {type: "All Startups", geotype: "All Startups"}
-          logoPath = "assets/engie_logo.png",
+          logoPath = "assets/bnp-paribas-logo.png",
           titleLogoWidth = 80,
           titleLogoHeight = 50,
           hoverOn = 0;
@@ -1518,6 +1518,20 @@
           .append("svg")
           .attr("width", width)
           .attr("height", height);
+
+        var filter = svg
+        .append("defs")
+        .append("filter")
+        .attr("id", "blur")
+        .append("feGaussianBlur")
+        .attr("stdDeviation", 1);
+
+      var filter2 = svg
+        .append("defs")
+        .append("filter")
+        .attr("id", "blur2")
+        .append("feGaussianBlur")
+        .attr("stdDeviation", 3);
   
         var chartSVG = svg
           .append("g")
@@ -1548,28 +1562,30 @@
         var chartTitle = chartSVG
           .append("text")
           .attr("class", "chart-title")
-          .text("BNP Paribas")
+          .text("BNP Paribas Compass – Pensions & Savings")
           .attr("y", (-height * 4.55) / 10)
           .style("display", "none")
   
         d3.select(".map-container").style("display", "none")
         d3.select(".map-tooltip").style("display", "none")
 
-        /*var chartLogo = chartSVG
+        var chartLogo = chartSVG
           .append("image")
           .attr("xlink:href", logoPath)
           .attr("width", titleLogoWidth)
           .attr("height", titleLogoHeight)
           .attr("y", -titleLogoHeight / 2)
           .attr("x", -titleLogoWidth / 2)
-          .style("display", "none")*/
+          .style("display", "none")
   
         d3.csv(
           "https://cors-anywhere.herokuapp.com/https://docs.google.com/spreadsheets/d/e/2PACX-1vRbG7TrPwBkpgmL5PG7RlZ5-Xl4aQ-qW3_hnLV9dBK3wAULU1WHV64VTCI6wCJNIkjU1PlCGQrhBi_1/pub?gid=0&single=true&output=csv"
         ).then(function(data) {
-          /*d3.csv(
-          "https://cors-anywhere.herokuapp.com/https://docs.google.com/spreadsheets/d/e/2PACX-1vSafGm_gSEK_M6dTEcS3sd2N7CcehHPfg561BJtgzrHClIt5DH79yqHI1LpeOLbbwGob_Xi0kVUdxMB/pub?gid=1462501778&single=true&output=csv"
-          ).then(function(desc) {*/
+          d3.csv(
+          "https://cors-anywhere.herokuapp.com/https://docs.google.com/spreadsheets/d/e/2PACX-1vRbG7TrPwBkpgmL5PG7RlZ5-Xl4aQ-qW3_hnLV9dBK3wAULU1WHV64VTCI6wCJNIkjU1PlCGQrhBi_1/pub?gid=2092178128&single=true&output=csv"
+          ).then(function(desc) {
+
+            console.log('desc', desc)
 
           var transform = d3.geoTransform({ point: projectPoint }),
             path = d3.geoPath().projection(transform);
@@ -1607,12 +1623,12 @@
 
 
               spinner.stop();
-              //d3.select("#button-16").style("display", "block")
+              d3.select("#button-16").style("display", "block")
               //d3.select("#button-17").style("display", "block")
               //d3.select(".dropdown-client").style("display", "inline-block")
               d3.select("#save-button").style("display", "block")
               d3.select(".chart-title").style("display", "")
-              //chartLogo.style("display", "block")
+              chartLogo.style("display", "block")
 
               d3.json("assets/world_countries.json").then(function(json) {
 
@@ -3137,6 +3153,13 @@
                     "-segment"
                   );
                 })
+                      .style("filter", function (d, i) {
+                        if (i > 2) {
+                          return "url(#blur2)";
+                        } else {
+                          ("");
+                        }
+                      })
                 .attr("d", tmpArc)
                 .attr("opacity", 1)
             });
@@ -3161,6 +3184,13 @@
                     d.data.value.replace(/ /g, "-").replace(/&/g, "and") +
                     "-segment"
                   );
+                })
+                .style("filter", function (d, i) {
+                  if (i > 2) {
+                    return "url(#blur2)";
+                  } else {
+                    ("");
+                  }
                 })
                 .attr("d", tmpArc)
                 .attr("opacity", 1)
@@ -3208,7 +3238,7 @@
                   d.data.value.toLowerCase().replace(/ /g, "-") + "-band"
                 );
               })
-              .attr("fill", "#7DCCFF")
+              .attr("fill", "#74BE9B")//7DCC
               .each(function(d, i) {
                 var firstArcSection = /(^.+?)L/;
                 var newArc = firstArcSection.exec(d3.select(this).attr("d"))[1];
@@ -3240,10 +3270,13 @@
                   .style("fill", "none");
               })
               .on("mouseover", function(d) {
+                if (d.data.value != "pensions plan" && d.data.value != "savings management") {
+                  //
+                } else {
                 labelMouseOver(d);
                 //hoverInfoFunction(d);
                 showOppSpaceTooltip(d)
-
+                }
               })
               .on("mouseout", function(d) {
                 if (hoverOn === 0) {
@@ -3921,15 +3954,14 @@
                   }
                 }
 
-                /*if (d.results) {
+                if (d.results) {
                 d.x = d.results[0];
                 d.y = d.results[1];
                 } else {
                 d.x = 0//results[0];
                 d.y = 0//results[1];
-                }*/
-                d.x = 0//results[0];
-                d.y = 0//results[1];
+                }
+
                 d.opacity = 1;
               });
 
@@ -4079,8 +4111,12 @@
               .data(data)
               .enter()
               .append("a")
-              .attr("xlink:href", function(d) {
-                return formatURL(d.Website)
+              .attr("xlink:href", function (d) {
+                if (d["Consolidated Tag"] != "pensions plan" && d["Consolidated Tag"] != "savings management") {
+                  return ""
+                } else {
+                  return formatURL(d.Website);
+                }
               })
               .attr("target", "_blank")
               .append("circle")
@@ -4088,11 +4124,35 @@
                 d.hide = false;
               })
               .attr("class", "nodes")
-              .attr("r", function(d) {
-                if (
-                    d["Funding Round"] !== "Acquired"
-                ) {
-                  return nodeRadius;
+                .attr("r", function (d) {
+                if (d["Funding Round"] !== "Acquired") {
+                  if (d["Consolidated Tag"] != "pensions plan" && d["Consolidated Tag"] != "savings management") {
+                    return nodeRadius*1.3;
+                  } else {
+                    return nodeRadius;
+                  }
+                }
+              })
+              .style("stroke", "black")
+              .style("stroke-width", function (d) {
+                if (d["Consolidated Tag"] != "pensions plan" && d["Consolidated Tag"] != "savings management") {
+                  return "0px";
+                } else {
+                  return "1px";
+                }
+              })
+              .style("filter", function (d) {
+              if (d["Consolidated Tag"] != "pensions plan" && d["Consolidated Tag"] != "savings management") {
+                return "url(#blur)";
+              } else {
+                return "none";
+              }
+            })
+              .style("opacity", function (d) {
+                if (d["Consolidated Tag"] != "pensions plan" && d["Consolidated Tag"] != "savings management") {
+                  return 0.4;
+                } else {
+                  return 1;
                 }
               })
               .attr("cx", function(d) {
@@ -4107,8 +4167,12 @@
                   );
               })
               .on("mouseover", function(d) {
-                //nodeMouseOver(d);
-                showNodeTooltip(d)
+                if (d["Consolidated Tag"] != "pensions plan" && d["Consolidated Tag"] != "savings management") {
+                  //
+                } else {
+                  showNodeTooltip(d)
+                }
+                
               })
               .on("mouseout", hideNodeTooltip);
   
@@ -4118,11 +4182,37 @@
               .enter()
               .append("a")
               .attr("xlink:href", function(d) {
-                return formatURL(d.Website)
+                if (d["Consolidated Tag"] != "pensions plan" && d["Consolidated Tag"] != "savings management") {
+                  //
+                } else {
+                  return formatURL(d.Website)
+                }
               })
               .attr("target", "_blank")
               .append("polygon")
               .attr("class", "nodes nodes-activity")
+                    .style("stroke", "black")
+                    .style("stroke-width", function (d) {
+                if (d["Consolidated Tag"] != "pensions plan" && d["Consolidated Tag"] != "savings management") {
+                        return "0px";
+                      } else {
+                        return "1px";
+                      }
+                    })
+                    .style("filter", function (d) {
+                if (d["Consolidated Tag"] != "pensions plan" && d["Consolidated Tag"] != "savings management") {
+                        return "url(#blur)";
+                      } else {
+                        return "none";
+                      }
+                    })
+                    .style("opacity", function (d) {
+                if (d["Consolidated Tag"] != "pensions plan" && d["Consolidated Tag"] != "savings management") {
+                        return 0.4;
+                      } else {
+                        return 1;
+                      }
+                    })
               .attr("id", function(d) {
                 return d["Startup Name"].toLowerCase().replace(/ /g, "-");
               })
@@ -4136,8 +4226,9 @@
               })
               .attr("fill", "#7C436A")
               .on("mouseover", function(d) {
-                //nodeMouseOver(d);
+                  if (d["Consolidated Tag"] != "pensions plan" && d["Consolidated Tag"] != "savings management") {
                 showNodeTooltip(d)
+                  }    
               })
               .on("mouseout", hideNodeTooltip);
   
@@ -4147,27 +4238,69 @@
               .enter()
               .append("a")
               .attr("xlink:href", function(d) {
-                return formatURL(d.Website)
+                if (d["Consolidated Tag"] != "pensions plan" && d["Consolidated Tag"] != "savings management") {
+                  return ""
+                } else {
+                  return formatURL(d.Website)
+                }
               })
               .attr("target", "_blank")
               .append("rect")
               .attr("class", "nodes nodes-acquired")
+                    .style("stroke", "black")
+                    .style("stroke-width", function (d) {
+                if (d["Consolidated Tag"] != "pensions plan" && d["Consolidated Tag"] != "savings management") {
+                        return "0px";
+                      } else {
+                        return "1px";
+                      }
+                    })
+                    .style("filter", function (d) {
+                if (d["Consolidated Tag"] != "pensions plan" && d["Consolidated Tag"] != "savings management") {
+                        return "url(#blur)";
+                      } else {
+                        return "none";
+                      }
+                    })
+                    .style("opacity", function (d) {
+                if (d["Consolidated Tag"] != "pensions plan" && d["Consolidated Tag"] != "savings management") {
+                        return 0.4;
+                      } else {
+                        return 1;
+                      }
+                    })
               .attr("id", function(d) {
                 return d["Startup Name"].toLowerCase().replace(/ /g, "-");
               })
               .attr("width", function(d) {
+              if (d["Consolidated Tag"] != "pensions plan" && d["Consolidated Tag"] != "savings management") {
+                if (d["Funding Round"] === "Acquired") {
+                  return nodeOtherWidth*1.3
+                } else {
+                  return 0;
+                }
+              } else {
                 if (d["Funding Round"] === "Acquired") {
                   return nodeOtherWidth
                 } else {
                   return 0;
                 }
+              }
               })
               .attr("height", function(d) {
+              if (d["Consolidated Tag"] != "pensions plan" && d["Consolidated Tag"] != "savings management") {
+                if (d["Funding Round"] === "Acquired") {
+                  return nodeOtherWidth*1.3
+                } else {
+                  return 0;
+                }
+              } else {
                 if (d["Funding Round"] === "Acquired") {
                   return nodeOtherWidth
                 } else {
                   return 0;
                 }
+              }
               })
               .attr("x", 0)
               .attr("y", 0)
@@ -4176,8 +4309,11 @@
                 return "translate(" + d.yearX + "," + d.yearY + ")    rotate(45)";
               })
               .on("mouseover", function(d) {
-                //nodeMouseOver(d);
-                showNodeTooltip(d)
+                  if (d["Consolidated Tag"] != "pensions plan" && d["Consolidated Tag"] != "savings management") {
+                //
+                  } else {
+                    showNodeTooltip(d)
+                  }    
               })
               .on("mouseout", hideNodeTooltip);
   
@@ -5213,7 +5349,7 @@
                       "#year-" +
                         d.key +
                         "-" +
-                        v.data.value.key.replace(/ /g, "-").replace(/&/g, "and") +
+                        v.data.value.replace(/ /g, "-").replace(/&/g, "and") +
                         "-segment"
                     ).attr("opacity", 1);
                   });
@@ -5276,7 +5412,7 @@
                       "#year-" +
                         d.key +
                         "-" +
-                        v.data.value.key.replace(/ /g, "-").replace(/&/g, "and") +
+                        v.data.value.replace(/ /g, "-").replace(/&/g, "and") +
                         "-segment"
                     ).attr("opacity", 0);
                   });
@@ -5301,7 +5437,7 @@
             function dateForMode(data) {
               if (
                 CompetitorMode === 0 ||
-                data["Competitor Categor  y"] !== "Activity"
+                data["Competitor Category"] !== "Activity"
               ) {
                 return data["Founded Year"];
               } else {
@@ -5348,6 +5484,7 @@
   
             function hoverInfoFunction(segment_data, clicked = "") {
               var segmentDesc;
+              
   
               desc.forEach(function(v) {
                 if (
@@ -5612,15 +5749,15 @@
               });
             }
 
-            function showOppSpaceTooltip(segment_data, clicked = "") {              
-              /*desc.forEach(function(v) {
+            function showOppSpaceTooltip(segment_data, clicked = "") { 
+              desc.forEach(function(v) {
                 if (
-                  segment_data.data.value.key ===
+                  segment_data.data.value ==
                   v["Opportunity Space"].toLowerCase().replace(/\//g, "_")
                 ) {
-                  segmentDesc = v.Description;
+                  segmentDesc = v.Definition;
                 }
-              });*/
+              });
             var count_by_focus_area = d3
               .nest()
               .key(function(d) {
@@ -5677,7 +5814,7 @@
                 }
               d3.select("#opp-space-tooltip-container").style("display", "block")
               d3.select(".opp-space-tooltip-title").text((segment_data.data.value).toUpperCase().replace(/_/g, "/"))
-              //d3.select("#ostt-1").text(segmentDesc)
+              d3.select("#ostt-1").text(segmentDesc)
               d3.select("#ostt-3").text(formatFunding(segmentFunding))
               d3.select("#ostt-5").text(numberOfStartups)
               d3.select("#ostt-7").text(formatFunding(avgFunding))
@@ -6389,7 +6526,7 @@
           });
           });
         
-        //});
+        });
   
         function round_to_precision(x, precision) {
           var y = +x + (precision === undefined ? 0.5 : precision / 2);
