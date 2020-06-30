@@ -2685,18 +2685,7 @@
               return valA < valB ? -1 : valA > valB ? 1 : valA >= valB ? 0 : NaN;
             }*/
 
-            var tempOrder = d3.nest()
-              .key(function(d) {
-                return d["Consolidated Tag"]
-              })
-              .sortKeys(function(a,b) {
-                return d3.ascending(a, b)
-              })
-              .entries(data)
-
-            tempOrder = tempOrder.map(function(v) {
-              return v.key
-            })
+            var tempOrder = ["pensions plan", "savings management", "asset management", "automated savings", "goal based savings", , "pooled savings", "robo advice", "social enterprise"]
             console.log('tempOrder', tempOrder)
 
 /*
@@ -3270,13 +3259,10 @@
                   .style("fill", "none");
               })
               .on("mouseover", function(d) {
-                if (d.data.value != "pensions plan" && d.data.value != "savings management") {
-                  //
-                } else {
                 labelMouseOver(d);
                 //hoverInfoFunction(d);
                 showOppSpaceTooltip(d)
-                }
+
               })
               .on("mouseout", function(d) {
                 if (hoverOn === 0) {
@@ -5756,6 +5742,7 @@
                   v["Opportunity Space"].toLowerCase().replace(/\//g, "_")
                 ) {
                   segmentDesc = v.Definition;
+                  segmentInsight = v.Insights;
                 }
               });
             var count_by_focus_area = d3
@@ -5818,7 +5805,7 @@
               d3.select("#ostt-3").text(formatFunding(segmentFunding))
               d3.select("#ostt-5").text(numberOfStartups)
               d3.select("#ostt-7").text(formatFunding(avgFunding))
-              //d3.select("#ostt-8").text(theme.toUpperCase())
+              d3.select("#ostt-8").text(segmentInsight)
               //d3.select("#ostt-9").text(themeDesc)
             }
 
