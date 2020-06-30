@@ -1384,7 +1384,8 @@
       <div id="ostt-6" class="opp-space-tooltip-sub-heading">Average Funding:</div>
       <div id="ostt-7" class="opp-space-tooltip-item"></div>
       <div id="ostt-8" class="opp-space-tooltip-item bold"></div>
-      <div id="ostt-9" class="opp-space-tooltip-item"></div>
+      <div id="ostt-9" class="opp-space-tooltip-item bold"></div>
+      <div id="ostt-10" class="opp-space-tooltip-item bold"></div>
     </div>
   </div>
     <div class="map-container">
@@ -5736,6 +5737,7 @@
             }
 
             function showOppSpaceTooltip(segment_data, clicked = "") { 
+              var segmentInsight = ""
               desc.forEach(function(v) {
                 if (
                   segment_data.data.value ==
@@ -5745,6 +5747,7 @@
                   segmentInsight = v.Insights;
                 }
               });
+              console.log(segmentInsight)
             var count_by_focus_area = d3
               .nest()
               .key(function(d) {
@@ -5799,14 +5802,35 @@
                 } else {
                   var avgFunding = segmentFunding / numberOfStartups;
                 }
+              console.log('segmentInsight', segmentInsight.split(';'))
               d3.select("#opp-space-tooltip-container").style("display", "block")
               d3.select(".opp-space-tooltip-title").text((segment_data.data.value).toUpperCase().replace(/_/g, "/"))
               d3.select("#ostt-1").text(segmentDesc)
               d3.select("#ostt-3").text(formatFunding(segmentFunding))
               d3.select("#ostt-5").text(numberOfStartups)
               d3.select("#ostt-7").text(formatFunding(avgFunding))
-              d3.select("#ostt-8").text(segmentInsight)
-              //d3.select("#ostt-9").text(themeDesc)
+              if (segmentInsight != "") {
+                if (segmentInsight.split(';').length === 3) {
+                  d3.select("#ostt-8").text(segmentInsight.split(';')[0])
+                  d3.select("#ostt-9").text(segmentInsight.split(';')[1])
+                  d3.select("#ostt-10").text(segmentInsight.split(';')[2])
+                } else {
+                  if (segmentInsight.split(';').length === 2) {
+                  d3.select("#ostt-8").text(segmentInsight.split(';')[0])
+                  d3.select("#ostt-9").text(segmentInsight.split(';')[1])
+                  d3.select("#ostt-10").text("")
+                  } else {
+                    d3.select("#ostt-8").text(segmentInsight.split(';')[0])
+                    d3.select("#ostt-9").text("")
+                  d3.select("#ostt-10").text("")
+                  }
+                }
+              } else {
+                d3.select("#ostt-8").text("")
+                                  d3.select("#ostt-9").text("")
+                  d3.select("#ostt-10").text("")
+              }
+
             }
 
             function formatURL(url) {
