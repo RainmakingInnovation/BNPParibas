@@ -1582,11 +1582,11 @@
         d3.csv(
           "BNP Paribas Startups - Database.csv"
         ).then(function(data) {
+          console.log('data', data)
           d3.csv(
           "BNP Paribas Startups - Consolidated Tags + Definitions.csv"
           ).then(function(desc) {
 
-            console.log('desc', desc)
 
           var transform = d3.geoTransform({ point: projectPoint }),
             path = d3.geoPath().projection(transform);
@@ -1619,6 +1619,12 @@
             })
               data = data.filter(function(v) {
               return v["Founded Year"] != ""
+            })
+
+            data.forEach(function(v) {
+              if (v['Funding Round'] == "Funded") {
+                v['Funding Round'] = "Undisclosed"
+              }
             })
 
 
@@ -1684,7 +1690,6 @@
             })*///
 
             function getLocation2(data, callback) {
-                console.log(data.key + ", " + data.values[0].Location)
 
                   geocoder.query(data.key + ", " + data.values[0].Location, function (error, point) {
                     data.cityLat = point.latlng[0]
@@ -2687,8 +2692,6 @@
             }*/
 
             var tempOrder = ["pensions plan", "savings management", "asset management", "automated savings", "goal based savings", , "pooled savings", "robo advice", "social enterprise"]
-            console.log('tempOrder', tempOrder)
-
 /*
             tempOrder.forEach(function(v) {
               v.values.sort(function(a, b) {
@@ -5747,7 +5750,6 @@
                   segmentInsight = v.Insights;
                 }
               });
-              console.log(segmentInsight)
             var count_by_focus_area = d3
               .nest()
               .key(function(d) {
@@ -5802,7 +5804,6 @@
                 } else {
                   var avgFunding = segmentFunding / numberOfStartups;
                 }
-              console.log('segmentInsight', segmentInsight.split(';'))
               d3.select("#opp-space-tooltip-container").style("display", "block")
               d3.select(".opp-space-tooltip-title").text((segment_data.data.value).toUpperCase().replace(/_/g, "/"))
               d3.select("#ostt-1").text(segmentDesc)
