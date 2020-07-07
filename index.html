@@ -215,6 +215,7 @@
         cursor: pointer;
       }
 
+      .key-title-customer,
       .key-title {
         font-weight: bold;
         font-family: "Graphik Bold";
@@ -479,9 +480,30 @@
         z-index: 1;
       }
 
-        #button-17,
+      #button-15,
+      #button-17,
       #button-16 {
         display: none;
+      }
+
+      #button-15 .knobs:before {
+        content: "Funding";
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        width: 60px;
+        height: 10px;
+        color: #fff;
+        font-size: 10px;
+        font-family: "Graphik Regular";
+        font-weight: bold;
+        text-align: center;
+        line-height: 1;
+        padding: 9px 4px;
+        background-color: #5fbdfb;
+        border-radius: 2px;
+        transition: 0.8s ease all,
+          left 0.8s cubic-bezier(0.18, 0.89, 0.35, 1.15);
       }
 
       #button-16 .knobs:before {
@@ -530,15 +552,22 @@
         background-color: #ea3b66;
       }
 
+      #button-15 .checkbox:active + .knobs:before,
       #button-17 .checkbox:active + .knobs:before,
       #button-16 .checkbox:active + .knobs:before {
         width: 46px;
       }
 
+      #button-15
+        .checkbox:checked:active
+        + .knobs:before {
+        margin-left: -26px;
+      }
+
       #button-17
         .checkbox:checked:active
-        + .knobs:before
-        #button-16
+        + .knobs:before,
+      #button-16
         .checkbox:checked:active
         + .knobs:before {
         margin-left: -26px;
@@ -550,6 +579,13 @@
         background-color: #ea3b66;
       }
 
+      #button-15 .checkbox:checked + .knobs:before {
+        content: "Customer";
+        left: 56px;
+        background-color: #ea3b66;
+      }
+
+      #button-15 .checkbox:checked ~ .layer,
       #button-17 .checkbox:checked ~ .layer,
       #button-16 .checkbox:checked ~ .layer {
         background-color: #fcebeb;
@@ -1412,6 +1448,11 @@
               <div class="knobs"></div>
               <div class="layer"></div>
             </div>
+            <div class="button b2" id="button-15">
+              <input type="checkbox" class="checkbox" />
+              <div class="knobs"></div>
+              <div class="layer"></div>
+            </div>
     
             <div>
 
@@ -1445,6 +1486,7 @@
           keySize = 10,
           keySpacing = 10,
           radial = "year",
+          key = "funding",
           animationDuration = 2000,
           keyWidth = 160,
           keyHeight = 260,
@@ -1628,9 +1670,28 @@
             })
 
 
+              customers = d3
+                .nest()
+                .key(function(d) {
+                  return d['Consolidated Customer']
+                })
+                .entries(data);
+
+              console.log('customers', customers)
+
+              customer_colors = ["#274C77", "#F5BB00", "#D75059", "#01AAFF", "#388659"]
+
+              var customer_scale = d3.scaleOrdinal()
+                .domain(customers.map(function(v) {
+                  return v.key
+                }))
+                .range(customer_colors)
+
+
 
               spinner.stop();
-              d3.select("#button-16").style("display", "block")
+              //d3.select("#button-16").style("display", "block")
+              d3.select("#button-15").style("display", "block")
               //d3.select("#button-17").style("display", "block")
               //d3.select(".dropdown-client").style("display", "inline-block")
               d3.select("#save-button").style("display", "block")
@@ -2142,7 +2203,11 @@
                           .append("circle")
                           .attr("class", "nodes")
                           .attr("r", function(d) {
-                            if (d["Funding Round"] !== "Acquired") {
+                            if (funding == key) {
+                              if (d["Funding Round"] !== "Acquired") {
+                                return nodeRadius;
+                             }
+                            } else {
                               return nodeRadius;
                             }
                           })
@@ -2150,9 +2215,15 @@
                             return d.opacity;
                           })
                           .attr("fill", function(d) {
-                            return nodeColorScale(
-                              fundingCategoryScale(d["Funding Round"])
-                            );
+                            if (key == "funding") {
+                              return nodeColorScale(
+                                fundingCategoryScale(d["Funding Round"])
+                              );
+                            } else {
+                              return customer_scale(
+                                (d["Consolidated Customer"])
+                              );
+                            }
                           })
                           .attr("cx", function(d) {
                             if (radial === "maturity") {
@@ -2196,17 +2267,25 @@
                             return d.opacity;
                           })
                           .attr("width", function(d) {
-                            if (d["Funding Round"] === "Acquired") {
-                              return nodeOtherWidth
+                            if (key == "funding") {
+                              if (d["Funding Round"] === "Acquired") {
+                                return nodeOtherWidth
+                              } else {
+                                return 0;
+                              }
                             } else {
-                              return 0;
+                              return 0
                             }
                           })
                           .attr("height", function(d) {
-                            if (d["Funding Round"] === "Acquired") {
-                              return nodeOtherWidth
+                            if (key == "funding") {
+                              if (d["Funding Round"] === "Acquired") {
+                                return nodeOtherWidth
+                              } else {
+                                return 0;
+                              }
                             } else {
-                              return 0;
+                              return 0
                             }
                           })
                           .attr("x", 0)
@@ -2691,7 +2770,7 @@
               return valA < valB ? -1 : valA > valB ? 1 : valA >= valB ? 0 : NaN;
             }*/
 
-            var tempOrder = ["pensions plan", "savings management", "asset management", "automated savings", "goal based savings", , "pooled savings", "robo advice", "social enterprise"]
+            var tempOrder = ["robo advice", "pensions plan", "savings management", "automated savings", "goal based savings", , "pooled savings",  "social enterprise", "asset management"]
 /*
             tempOrder.forEach(function(v) {
               v.values.sort(function(a, b) {
@@ -3457,6 +3536,65 @@
                 var vert = i * h - offset - 90;
                 return "translate(" + horz + "," + vert + ")";
               });
+
+            var keyCustomer = keySVG
+              .selectAll("g.key-other")
+              .data(customers.map(function(v) {
+                  return v.key
+                }))
+              .enter()
+              .append("g")
+              .attr("transform", function(d, i) {
+                var h = keySize + keySpacing;
+                var offset = 0;
+                var horz = -50;
+                var vert = i * h - offset - 95;
+                return "translate(" + horz + "," + vert + ")";
+              })
+              .style("display", "none")
+
+            keyCustomer
+              .append("circle")
+              .classed("key-item-other", true)
+              .attr("r", 4.4)
+              .attr("fill", function(d) {
+                return customer_scale(d);
+              })
+              /*.on("mouseover", function(d) {
+                keyMouseOver(d, "color");
+              })*/
+              //.on("mouseout", keyMouseOut)
+              /*.on("click", function(d) {
+                if (filterKey === d) {
+                  filterKey = "";
+                  updateNodes("key", filterKey);
+                } else {
+                  filterKey = d;
+                  updateNodes("key", filterKey);
+                }
+              });*/
+  
+            keyCustomer
+              .append("text")
+              .text(function(d) {
+                return d;
+              })
+              .classed("key-labels key-label", true)
+              .attr("dx", "1.8em")
+              .attr("dy", "0.35em")
+              /*.on("mouseover", function(d) {
+                keyMouseOver(d, "color");
+              })
+              .on("mouseout", keyMouseOut)
+              .on("click", function(d) {
+                if (filterKey === d) {
+                  filterKey = "";
+                  updateNodes("key", filterKey);
+                } else {
+                  filterKey = d;
+                  updateNodes("key", filterKey);
+                }
+              });*/
   
             var keyAcquired = keySVG
               .append("g")
@@ -3658,6 +3796,14 @@
               .text("Funding Key:")
               .attr("y", -110)
               .attr("x", -60);
+
+            var key_title_customer = keySVG
+              .append("text")
+              .attr("class", "key-title-customer")
+              .text("Customer Key:")
+              .attr("y", -115)
+              .attr("x", -60)
+              .style("display", "none")
   
             /* var switchBtn = svg
                 .append("rect")
@@ -4077,6 +4223,10 @@
                 }
               });
 
+              d3.select("#button-15").on("change", function() {
+                switchKey();
+              });
+
               d3.select("#button-16").on("change", function() {
                 switchRadial();
               });
@@ -4114,7 +4264,7 @@
                 d.hide = false;
               })
               .attr("class", "nodes")
-                .attr("r", function (d) {
+              .attr("r", function (d) {
                 if (d["Funding Round"] !== "Acquired") {
                   if (d["Consolidated Tag"] != "pensions plan" && d["Consolidated Tag"] != "savings management") {
                     return nodeRadius*1.3;
@@ -5274,6 +5424,81 @@
 
 
                 
+            }
+
+            function switchKey() {
+              if (key === "funding") {
+                key = "customer"
+                d3.selectAll(".nodes")
+                  .attr("r", function (d) {
+                      if (d["Consolidated Tag"] != "pensions plan" && d["Consolidated Tag"] != "savings management") {
+                        return nodeRadius*1.3;
+                      } else {
+                        return nodeRadius;
+                      }
+                  })
+                .attr("fill", function(d) {
+                  return customer_scale(
+                      (d["Consolidated Customer"])
+                    );
+                })
+
+                  d3.selectAll(".nodes-acquired")
+                    .attr("width", function(d) {
+                      return 0
+                    })
+                    .attr("height", function(d) {
+                      return 0
+                    })
+
+                d3.select(".key-title").style("display", "none")
+                keyOther.style("display", "none")
+                keyAcquired.style("display", "none")
+                keyCustomer.style("display", "block")
+                d3.select(".key-title-customer").style("display", "block")
+
+              } else {
+                key = "funding"
+
+                d3.selectAll(".nodes")
+                  .attr("r", function (d) {
+                    if (d["Funding Round"] !== "Acquired") {
+                      if (d["Consolidated Tag"] != "pensions plan" && d["Consolidated Tag"] != "savings management") {
+                        return nodeRadius*1.3;
+                      } else {
+                        return nodeRadius;
+                      }
+                    }
+                  })
+                  .attr("fill", function(d) {
+                    return nodeColorScale(
+                      fundingCategoryScale(d["Funding Round"])
+                    );
+                  })
+
+                  d3.selectAll(".nodes-acquired")
+                    .attr("width", function(d) {
+                      if (d["Funding Round"] === "Acquired") {
+                        return nodeOtherWidth
+                      } else {
+                        return 0;
+                      }
+                    })
+                    .attr("height", function(d) {
+                      if (d["Funding Round"] === "Acquired") {
+                        return nodeOtherWidth
+                      } else {
+                        return 0;
+                      }
+                    })
+                    .attr("fill", "#FFFD82")
+   
+                  d3.select(".key-title").style("display", "block")
+                  keyOther.style("display", "block")
+                  keyAcquired.style("display", "block")
+                  keyCustomer.style("display", "none")
+                  d3.select(".key-title-customer").style("display", "none")
+              }
             }
   
             
