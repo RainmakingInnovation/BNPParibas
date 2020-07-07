@@ -1556,11 +1556,49 @@
           d3.select("#radar-toggle-btn").attr("class", "left-sidebar-btn active")
           d3.select(".popup-bg").style("display", "none")
   
+            function responsivefy(svg) {
+          // get container + svg aspect ratio
+          var container = d3.select(svg.node().parentNode),
+            width = parseInt(svg.style("width")),
+            height = parseInt(svg.style("height")),
+            aspect = width / height;
+
+          // add viewBox and preserveAspectRatio properties,
+          // and call resize so that svg resizes on inital page load
+          svg
+            .attr("viewBox", "0 0 " + width + " " + height)
+            .attr("perserveAspectRatio", "xMinYMid")
+            .call(resize);
+
+          // to register multiple listeners for same event type,
+          // you need to add namespace, i.e., 'click.foo'
+          // necessary if you call invoke this function for multiple svgs
+          // api docs: https://github.com/mbostock/d3/wiki/Selections#on
+          d3.select(window).on("resize." + container.attr("id"), resize);
+
+          // get width of container and resize svg to fit it
+          function resize() {
+            targetWidth = window.innerWidth - 360
+            targetHeightFromWidth = Math.round(targetWidth / aspect)
+            targetHeight = window.innerHeight
+            if (targetHeightFromWidth > targetHeight) {
+              svg.attr("width", Math.round(targetHeight*aspect));
+              svg.attr("height", targetHeight);
+            } else {
+              svg.attr("width", targetWidth);
+              svg.attr("height", targetHeightFromWidth);
+            }
+
+          }
+        }
         var svg = d3
           .select("#chart-container")
           .append("svg")
           .attr("width", width)
-          .attr("height", height);
+          .attr("height", height)
+          .call(responsivefy)
+
+        const svg_width = d3.select("#chart-container").node().clientWidth
 
         var filter = svg
         .append("defs")
@@ -1576,6 +1614,13 @@
         .append("feGaussianBlur")
         .attr("stdDeviation", 3);
   
+          d3.select("#chart-container").style("left", (146) + "px")
+
+          const svg_left = (d3.select("#chart-container").style("left"))
+          d3.select("#key-container").style("left", (+svg_left.slice(0,-2)-20 + svg_width) + "px").style("top", (window.innerHeight/2 - 60) + "px")
+          d3.select("#control-container").style("left", (+svg_left.slice(0,-2)-20 + svg_width) + "px").style("top", (window.innerHeight/2 + 80) + "px")
+          d3.select("#opp-space-tooltip-container").style("left", (+svg_left.slice(0,-2) + svg_width + 160) + "px").style("top", ((window.innerHeight/2 - 60)) + "px")
+
         var chartSVG = svg
           .append("g")
           .attr(
@@ -5906,6 +5951,8 @@
                 nodes.attr("opacity", 0.3);
                 nodes_activity.attr("opacity", 0.3);
               }
+              console.log('data', data)
+              console.log('type', type)
               /* if (type === "size") {
                   nodes.attr("opacity", function(d) {
                     if (nodeSizeScaleFunction(d["Funding amount ($)"]) === data) {
