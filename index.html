@@ -3225,13 +3225,13 @@
                     "-segment"
                   );
                 })
-                      .style("filter", function (d, i) {
-                        if (i > 2) {
-                          return "url(#blur2)";
-                        } else {
-                          ("");
-                        }
-                      })
+                .style("filter", function (d, i) {
+                  if (i > 2 || i < 1) {
+                    return "url(#blur2)";
+                  } else {
+                    ("");
+                  }
+                })
                 .attr("d", tmpArc)
                 .attr("opacity", 1)
             });
@@ -3258,7 +3258,7 @@
                   );
                 })
                 .style("filter", function (d, i) {
-                  if (i > 2) {
+                  if (i > 2 || i < 1) {
                     return "url(#blur2)";
                   } else {
                     ("");
