@@ -1231,6 +1231,15 @@
     display: none;
   }
 
+  .alt-checkbox {
+    font-family: "Graphik Regular";
+    padding: 5px;
+    font-size: 10px;
+    cursor: pointer;
+    float: left;
+    display: none;
+  }
+
     </style>
 
   </head>
@@ -1453,7 +1462,22 @@
               <div class="knobs"></div>
               <div class="layer"></div>
             </div>
-    
+              <div class="alt-checkbox alt-checkbox-api-no">
+                <i class="far fa-check-square fa-lg"></i>
+                No API Integration
+              </div>
+              <div class="alt-checkbox alt-checkbox-api-yes">
+                <i class="far fa-check-square fa-lg"></i>
+                API Integration
+              </div>
+              <div class="alt-checkbox alt-checkbox-financial">
+                <i class="far fa-check-square fa-lg"></i>
+                Financial
+              </div>
+              <div class="alt-checkbox alt-checkbox-non-financial">
+                <i class="far fa-check-square fa-lg"></i>
+                Non-Financial
+              </div>
             <div>
 
 
@@ -1506,7 +1530,11 @@
           bar_height = 460,
           popupMode = {"page": "none", "type": "none"},
           indexTracker = {},
-          indexTrackerYear = {};
+          indexTrackerYear = {},
+          api_no = true,
+          api_yes = true,
+          financial = true,
+          non_financial = true;
 
       // mapbox access token
       const accessToken =
@@ -1737,6 +1765,7 @@
               spinner.stop();
               //d3.select("#button-16").style("display", "block")
               d3.select("#button-15").style("display", "block")
+              d3.selectAll(".alt-checkbox").style("display", "block")
               //d3.select("#button-17").style("display", "block")
               //d3.select(".dropdown-client").style("display", "inline-block")
               d3.select("#save-button").style("display", "block")
@@ -3605,19 +3634,19 @@
               .attr("fill", function(d) {
                 return customer_scale(d);
               })
-              /*.on("mouseover", function(d) {
-                keyMouseOver(d, "color");
-              })*/
-              //.on("mouseout", keyMouseOut)
-              /*.on("click", function(d) {
+              .on("mouseover", function(d) {
+                keyMouseOver(d, "color-customer");
+              })
+              .on("mouseout", keyMouseOut)
+              .on("click", function(d) {
                 if (filterKey === d) {
                   filterKey = "";
-                  updateNodes("key", filterKey);
+                  update_nodes("", filterKey);
                 } else {
                   filterKey = d;
-                  updateNodes("key", filterKey);
+                  update_nodes("key", filterKey);
                 }
-              });*/
+              });
   
             keyCustomer
               .append("text")
@@ -3627,19 +3656,19 @@
               .classed("key-labels key-label", true)
               .attr("dx", "1.8em")
               .attr("dy", "0.35em")
-              /*.on("mouseover", function(d) {
-                keyMouseOver(d, "color");
+              .on("mouseover", function(d) {
+                keyMouseOver(d, "color-customer");
               })
               .on("mouseout", keyMouseOut)
               .on("click", function(d) {
                 if (filterKey === d) {
                   filterKey = "";
-                  updateNodes("key", filterKey);
+                  update_nodes("", filterKey);
                 } else {
                   filterKey = d;
-                  updateNodes("key", filterKey);
+                  update_nodes("key", filterKey);
                 }
-              });*/
+              });
   
             var keyAcquired = keySVG
               .append("g")
@@ -3661,10 +3690,10 @@
               .on("click", function(d) {
                 if (filterKey === "acquired") {
                   filterKey = "";
-                  updateNodes("key", filterKey);
+                  update_nodes("key", filterKey);
                 } else {
                   filterKey = "acquired";
-                  updateNodes("key", filterKey);
+                  update_nodes("key", filterKey);
                 }
               });
   
@@ -3681,10 +3710,10 @@
               .on("click", function(d) {
                 if (filterKey === "acquired") {
                   filterKey = "";
-                  updateNodes("key", filterKey);
+                  update_nodes("", filterKey);
                 } else {
                   filterKey = "acquired";
-                  updateNodes("key", filterKey);
+                  update_nodes("key", filterKey);
                 }
               });
   
@@ -3698,8 +3727,18 @@
               .on("mouseover", function(d) {
                 keyMouseOver(d, "color");
               })
-              //.on("mouseout", keyMouseOut)
-              .on("click", function(d) {
+                .on("click", function(d) {
+                  
+                if (filterKey == d) {
+                  filterKey = ""
+                  update_nodes("", filterKey)
+                } else {
+                  filterKey = d
+                  update_nodes("key", filterKey)
+                }
+              })
+              .on("mouseout", keyMouseOut)
+              /*.on("click", function(d) {
                 if (filterKey === d) {
                   filterKey = "";
                   updateNodes("key", filterKey);
@@ -3707,7 +3746,7 @@
                   filterKey = d;
                   updateNodes("key", filterKey);
                 }
-              });
+              });*/
   
             keyOther
               .append("text")
@@ -3717,11 +3756,20 @@
               .classed("key-labels key-label", true)
               .attr("dx", "1.8em")
               .attr("dy", "0.35em")
-              .on("mouseover", function(d) {
+              /*.on("mouseover", function(d) {
                 keyMouseOver(d, "color");
-              })
+              })*/
               .on("mouseout", keyMouseOut)
               .on("click", function(d) {
+                if (filterKey == d) {
+                  filterKey = ""
+                  update_nodes("", filterKey)
+                } else {
+                  filterKey = d
+                  update_nodes("key", filterKey)
+                }
+              })
+              /*.on("click", function(d) {
                 if (filterKey === d) {
                   filterKey = "";
                   updateNodes("key", filterKey);
@@ -3729,111 +3777,8 @@
                   filterKey = d;
                   updateNodes("key", filterKey);
                 }
-              });
-  
-            keyActivity = keySVG
-              .append("g")
-              .attr("transform", "translate(-50,-90)")
-              .style("display", "none");
-  
-            keyActivity
-              .append("polygon")
-              .classed("key-item-other", true)
-              .attr("id", "activity-key")
-              .attr("points", [
-                [0, -4.7],
-                [-4.2, 3.7],
-                [4.2, 3.7]
-              ])
-              .attr("dy", -10)
-              .attr("dx", 10)
-              .attr("fill", "#7C436A")
-              .attr("opacity", function() {
-                if (filterKey === "") {
-                  return 1;
-                } else {
-                  return 0.3;
-                }
-              })
-              .on("mouseover", function() {
-                keyMouseOver("", "activity");
-              })
-              .on("mouseout", keyMouseOut)
-              .on("click", function() {
-                if (filterKey === "activity") {
-                  filterKey = "";
-                  updateNodes("", filterKey);
-                } else {
-                  filterKey = "activity";
-                  updateNodes("", filterKey);
-                }
-              });
-  
-            keyActivity
-              .append("text")
-              .text("Activity")
-              .classed("key-labels key-label", true)
-              .attr("id", "activity-key-label")
-              .attr("dx", "1.8em")
-              .attr("dy", "0.3em")
-              .attr("opacity", function() {
-                if (filterKey === "") {
-                  return 1;
-                } else {
-                  return 0.3;
-                }
-              })
-              .on("mouseover", function() {
-                keyMouseOver("", "activity");
-              })
-              .on("mouseout", keyMouseOut)
-              .on("click", function() {
-                if (filterKey === "activity") {
-                  filterKey = "";
-                  updateNodes("", filterKey);
-                } else {
-                  filterKey = "activity";
-                  updateNodes("", filterKey);
-                }
-              });
-  
-            keyInvestment = keySVG
-              .append("g")
-              .attr("transform", "translate(-50,120)")
-              .style("display", "none");
-  
-            keyInvestment
-              .append("circle")
-              .classed("key-item-other", true)
-              .attr("id", "investment-key")
-              .attr("cx", 0)
-              .attr("cy", 0)
-              .attr("r", 4.4)
-              .attr("dy", -10)
-              .attr("dx", 10)
-              .attr("fill", "none")
-              .attr("opacity", function() {
-                if (filterKey === "") {
-                  return 1;
-                } else {
-                  return 0.3;
-                }
-              });
-  
-            keyInvestment
-              .append("text")
-              .text("Investment")
-              .classed("key-labels key-label", true)
-              .attr("id", "investment-key-label")
-              .attr("dx", "1.8em")
-              .attr("dy", "0.3em")
-              .attr("opacity", function() {
-                if (filterKey === "") {
-                  return 1;
-                } else {
-                  return 0.3;
-                }
-              });
+              });*/
+
   
             var keyTitle = keySVG
               .append("text")
@@ -4268,6 +4213,72 @@
                 }
               });
 
+              d3.select(".alt-checkbox-api-no").on("click", function() {
+                if (api_no == true) {
+                  api_no = false
+                  d3.select(".alt-checkbox-api-no").select(".far").attr("class", function() {
+                    return "far fa-square fa-lg"
+                  })
+                  update_visibility()
+                } else {
+                  api_no = true
+                  d3.select(".alt-checkbox-api-no").select(".far").attr("class", function() {
+                    return "far fa-check-square fa-lg"
+                  })
+                  update_visibility()
+                }
+              })
+
+              d3.select(".alt-checkbox-api-yes").on("click", function() {
+                if (api_yes == true) {
+                  api_yes = false
+                  d3.select(".alt-checkbox-api-yes").select(".far").attr("class", function() {
+                    return "far fa-square fa-lg"
+                  })
+                  update_visibility()
+                } else {
+                  api_yes = true
+                  d3.select(".alt-checkbox-api-yes").select(".far").attr("class", function() {
+                    return "far fa-check-square fa-lg"
+                  })
+                  update_visibility()
+                }
+              })
+
+              d3.select(".alt-checkbox-financial").on("click", function() {
+                if (financial == true) {
+                  financial = false
+                  d3.select(".alt-checkbox-financial").select(".far").attr("class", function() {
+                    return "far fa-square fa-lg"
+                  })
+                  update_visibility()
+                } else {
+                  financial = true
+                  d3.select(".alt-checkbox-financial").select(".far").attr("class", function() {
+                    return "far fa-check-square fa-lg"
+                  })
+                  update_visibility()
+                }
+              })
+
+              d3.select(".alt-checkbox-non-financial").on("click", function() {
+                if (non_financial == true) {
+                  non_financial = false
+                  d3.select(".alt-checkbox-non-financial").select(".far").attr("class", function() {
+                    return "far fa-square fa-lg"
+                  })
+                  update_visibility()
+                } else {
+                  non_financial = true
+                  d3.select(".alt-checkbox-non-financial").select(".far").attr("class", function() {
+                    return "far fa-check-square fa-lg"
+                  })
+                  update_visibility()
+                }
+              })
+
+
+
               d3.select("#button-15").on("change", function() {
                 switchKey();
               });
@@ -4512,8 +4523,95 @@
                 });
                 nodes_acquired.attr("opacity", 0.3);
               } */
+
+            function update_nodes(type, filterKey) {
+              console.log('type', type)
+              console.log('filterKey', filterKey)
+
+              if (type == "") {
+                // reset keys
+                keyOther.style("opacity", 1);
+                keyAcquired.style("opacity", 1);
+                keyCustomer.style("opacity", 1);
+
+                // reset nodes
+                nodes.style("opacity", function (d) {
+                  if (d["Consolidated Tag"] != "pensions plan" && d["Consolidated Tag"] != "savings management") {
+                    d.opacity = 0.3
+                  } else {
+                    d.opacity = 1
+                  }
+                  return d.opacity
+                })
+
+              nodes_acquired.style("opacity", function (d) {
+                if (d["Consolidated Tag"] != "pensions plan" && d["Consolidated Tag"] != "savings management") {
+                    d.opacity = 0.3
+                  } else {
+                    d.opacity = 1
+                  }
+                return d.opacity
+                })
+              } else {
+                // set key opacity
+                keyOther.style("opacity", function(v) {
+                  if (v != filterKey) {
+                    return 0.3
+                  } else {
+                    return 1
+                  }
+                })
+                keyAcquired.style("opacity", function(v) {
+                  if ("acquired" != filterKey) {
+                    return 0.3
+                  } else {
+                    return 1
+                  }
+                })
+                keyCustomer.style("opacity", function(v) {
+                  if (v != filterKey) {
+                    return 0.3
+                  } else {
+                    return 1
+                  }
+                })
+
+                if (type == "key") {
+                  nodes.style("opacity", function(v) {
+                    if (key == "funding") {
+                      if (filterKey == fundingCategoryScale(v["Funding Round"]) && v["Funding Round"] != "Acquired") {
+                        console.log('filterKey', filterKey)
+                        v.opacity = 1
+                      } else {
+                        v.opacity = 0.3
+                      }
+                    } else {
+                      if (filterKey == v["Consolidated Customer"]) {
+                        v.opacity = 1
+                      } else {
+                        v.opacity = 0.3
+                      }
+                    }
+                    return v.opacity
+                  })
+                  nodes_acquired.style("opacity", function(v) {
+                    if (key == "funding") {
+                      
+                      if (filterKey.charAt(0).toUpperCase() + filterKey.slice(1) == v["Funding Round"] && filterKey == "acquired") {
+                        v.opacity = 1
+                      } 
+                    } 
+                    return v.opacity
+                  })
+                }
+                // end
+              }
+            // end
+            }
   
             function updateNodes(type, filterKey) {
+              console.log('type', type)
+              console.log('filterKey', filterKey)
               if (filterKey === "") {
                 data.forEach(function(d) {
                   d.opacity = 1;
@@ -4602,7 +4700,7 @@
                 type === "key"
               ) {
                 
-                nodes.attr("opacity", function(v) {
+                nodes.style("opacity", function(v) {
                   if (fundingCategoryScale(v["Funding Round"]) === filterKey) {
                     v.opacity = 1;
                   } else {
@@ -4611,21 +4709,21 @@
                   return v.opacity;
                 });
   
-                nodes_acquired.attr("opacity", function(d) {
+                nodes_acquired.style("opacity", function(d) {
                   if (d["Funding Round"] === "Acquired") {
                     d.opacity = 0.3;
                   }
                   return d.opacity;
                 });
   
-                nodes_activity.attr("opacity", function(d) {
+                nodes_activity.style("opacity", function(d) {
                   if (d["Activity/Acquisition Time"] != "") {
                     d.opacity = 0.3;
                   }
                   return d.opacity;
                 });
   
-                keyOther.attr("opacity", function(d) {
+                keyOther.style("opacity", function(d) {
                   if (d === filterKey) {
                     return 1;
                   } else {
@@ -4633,9 +4731,9 @@
                   }
                 });
   
-                keyAcquired.attr("opacity", 0.3);
+                keyAcquired.style("opacity", 0.3);
   
-                keyActivity.attr("opacity", 0.3);
+                keyActivity.style("opacity", 0.3);
               }
               if (type === "focus area" && filterKey !== "") {
                 nodes.attr("opacity", function(d) {
@@ -5471,6 +5569,25 @@
                 
             }
 
+            function update_visibility() {
+              nodes.style("visibility", function(d) {
+                var visibility = "visible"
+                if (api_no == false && d["API Integration"] == "No") {
+                  visibility = "hidden"
+                }
+                if (api_yes == false && d["API Integration"] == "Yes") {
+                  visibility = "hidden"
+                }
+                if (financial == false && d["Financial/Non-Financial"] == "Financial") {
+                  visibility = "hidden"
+                }
+                if (non_financial == false && d["Financial/Non-Financial"] == "Non-Financial") {
+                  visibility = "hidden"
+                }
+                return visibility
+              })
+            }
+
             function switchKey() {
               if (key === "funding") {
                 key = "customer"
@@ -5947,12 +6064,11 @@
   
             function keyMouseOver(data, type) {
               if (type === "acquired") {
-                nodes_acquired.attr("opacity", 1);
-                nodes.attr("opacity", 0.3);
-                nodes_activity.attr("opacity", 0.3);
+                nodes_acquired.style("opacity", 1);
+                nodes.style("opacity", 0.3);
+                nodes_activity.style("opacity", 0.3);
               }
-              console.log('data', data)
-              console.log('type', type)
+
               /* if (type === "size") {
                   nodes.attr("opacity", function(d) {
                     if (nodeSizeScaleFunction(d["Funding amount ($)"]) === data) {
@@ -5964,15 +6080,27 @@
                   nodes_acquired.attr("opacity", 0.3);
                 } */
               if (type === "color") {
-                nodes.attr("opacity", function(d) {
+                nodes.style("opacity", function(d) {
                   if (fundingCategoryScale(d["Funding Round"]) === data) {
                     return 1;
                   } else {
                     return 0.3;
                   }
                 });
-                nodes_acquired.attr("opacity", 0.3);
-                nodes_activity.attr("opacity", 0.3);
+                nodes_acquired.style("opacity", 0.3);
+                nodes_activity.style("opacity", 0.3);
+              }
+
+              if (type === "color-customer") {
+                nodes.style("opacity", function(d) {
+                  if (d['Consolidated Customer'] == data) {
+                    return 1;
+                  } else {
+                    return 0.3;
+                  }
+                });
+                nodes_acquired.style("opacity", 0.3);
+                nodes_activity.style("opacity", 0.3);
               }
   
               if (type === "activity") {
@@ -6003,12 +6131,14 @@
             }
   
             function keyMouseOut() {
-              nodes.attr("opacity", function(d) {
-                return d.opacity;
-              });
-              nodes_acquired.attr("opacity", function(d) {
-                return d.opacity;
-              });
+              nodes
+                .style("opacity", function (d) {
+                  return d.opacity
+                })
+              nodes_acquired
+                .style("opacity", function (d) {
+                  return d.opacity
+                })
             }
 
             function showOppSpaceTooltip(segment_data, clicked = "") { 
