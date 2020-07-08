@@ -6242,7 +6242,11 @@
               if (url.slice(0,3) === "www") {
                 return "http://" + url
               } else {
-                return url
+                if (url.slice(0,5) === "https") {
+                  return url
+                } else {
+                  return "https://www." + url
+                }
               }
             }
 
