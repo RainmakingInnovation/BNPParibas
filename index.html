@@ -5588,6 +5588,23 @@
                 }
                 return visibility
               })
+
+              nodes_acquired.style("visibility", function(d) {
+                var visibility = "visible"
+                if (api_no == false && d["API Integration"] == "No") {
+                  visibility = "hidden"
+                }
+                if (api_yes == false && d["API Integration"] == "Yes") {
+                  visibility = "hidden"
+                }
+                if (financial == false && d["Financial/Non-Financial"] == "Financial") {
+                  visibility = "hidden"
+                }
+                if (non_financial == false && d["Financial/Non-Financial"] == "Non-Financial") {
+                  visibility = "hidden"
+                }
+                return visibility
+              })
             }
 
             function switchKey() {
