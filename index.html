@@ -23,7 +23,7 @@
     <style type="text/css">
       body {
         display: grid;
-        grid-template-columns: 146px 800px 160px 200px;
+        grid-template-columns: 146px 800px;
         grid-template-rows: 300px 120px 400px;
         grid-gap: 0.1em;
         margin: auto;
@@ -36,22 +36,20 @@
       }
 
       #key-container {
-        grid-column: 3 / span 1;
-        grid-row: 2 / span 1;
+        position: relative;
         overflow: hidden;
       }
 
       #control-container {
-        grid-column: 3 / span 1;
-        grid-row: 3 / span 1;
+        position: relative;
         overflow: hidden;
         padding: 10px 20px;
+        width: 120px;
         text-align: center;
       }
 
       #hover-info-container {
-        grid-column: 4 / span 1;
-        grid-row: 2 / span 2;
+        position: relative;
         overflow: hidden;
         padding: 5px;
       }
@@ -169,10 +167,6 @@
       .wrap-header {
         font-family: "Graphik Bold";
         font-weight: bold;
-      }
-
-      #chart-container {
-        text-align: center;
       }
 
       .node-mouse-over-box {
@@ -1189,8 +1183,9 @@
   }
 
   #opp-space-tooltip-container {
-    grid-column: 4 / span 1;
-    grid-row: 2 / span 2;
+    position: relative;
+    width: 200px;
+    top: -160px;
     display: none;
   }
 
@@ -1245,7 +1240,7 @@
   </head>
 
   <body>
-      <div id="key-container"></div>
+     
     <div class="node-tooltip">
       <div class="node-tooltip-title"></div>
       <div class="node-tooltip-funding"></div>
@@ -1418,20 +1413,7 @@
     </div>
 
     <div id="hover-info-container"></div>
-  <div id="opp-space-tooltip-container">
-      <div class="opp-space-tooltip">
-      <div class="opp-space-tooltip-title"></div>
-      <div id="ostt-1" class="opp-space-tooltip-item"></div>
-      <div id="ostt-2" class="opp-space-tooltip-sub-heading">Total Funding:</div>
-      <div id="ostt-3" class="opp-space-tooltip-item"></div>
-      <div id="ostt-4" class="opp-space-tooltip-sub-heading">Total Number of Startups:</div>
-      <div id="ostt-5" class="opp-space-tooltip-item"></div>
-      <div id="ostt-6" class="opp-space-tooltip-sub-heading">Average Funding:</div>
-      <div id="ostt-7" class="opp-space-tooltip-item"></div>
-      <div id="ostt-8" class="opp-space-tooltip-item bold"></div>
-      <div id="ostt-9" class="opp-space-tooltip-item bold"></div>
-      <div id="ostt-10" class="opp-space-tooltip-item bold"></div>
-    </div>
+
   </div>
     <div class="map-container">
       <div class="sidebar">
@@ -1444,6 +1426,7 @@
 
 </div>
     <div id="chart-container"></div>
+    <div id="key-container"></div>
     <div id="control-container">
       <div>
           <div>
@@ -1493,7 +1476,22 @@
         </div>
         
       </div>
-      
+      </div>
+    </div>
+      <div id="opp-space-tooltip-container">
+      <div class="opp-space-tooltip">
+      <div class="opp-space-tooltip-title"></div>
+      <div id="ostt-1" class="opp-space-tooltip-item"></div>
+      <div id="ostt-2" class="opp-space-tooltip-sub-heading">Total Funding:</div>
+      <div id="ostt-3" class="opp-space-tooltip-item"></div>
+      <div id="ostt-4" class="opp-space-tooltip-sub-heading">Total Number of Startups:</div>
+      <div id="ostt-5" class="opp-space-tooltip-item"></div>
+      <div id="ostt-6" class="opp-space-tooltip-sub-heading">Average Funding:</div>
+      <div id="ostt-7" class="opp-space-tooltip-item"></div>
+      <div id="ostt-8" class="opp-space-tooltip-item bold"></div>
+      <div id="ostt-9" class="opp-space-tooltip-item bold"></div>
+      <div id="ostt-10" class="opp-space-tooltip-item bold"></div>
+    </div>
     </div>
 
     <div id="tmp-container"></div>
@@ -1626,7 +1624,7 @@
           .attr("height", height)
           .call(responsivefy)
 
-        const svg_width = d3.select("#chart-container").node().clientWidth
+        const svg_width = d3.select("svg").node().clientWidth
 
         var filter = svg
         .append("defs")
@@ -1645,9 +1643,12 @@
           d3.select("#chart-container").style("left", (146) + "px")
 
           const svg_left = (d3.select("#chart-container").style("left"))
-          d3.select("#key-container").style("left", (+svg_left.slice(0,-2)-20 + svg_width) + "px").style("top", (window.innerHeight/2 - 60) + "px")
-          d3.select("#control-container").style("left", (+svg_left.slice(0,-2)-20 + svg_width) + "px").style("top", (window.innerHeight/2 + 80) + "px")
-          d3.select("#opp-space-tooltip-container").style("left", (+svg_left.slice(0,-2) + svg_width + 160) + "px").style("top", ((window.innerHeight/2 - 60)) + "px")
+          console.log('svg_width', svg_width)
+          console.log('svg_left.slice(0,-2)', svg_left.slice(0,-2))
+          console.log('(+svg_left.slice(0,-2)-20 + svg_width)', +svg_left.slice(0,-2)-20 + svg_width )
+          d3.select("#key-container").style("left", (+svg_left.slice(0,-2) + svg_width) + "px")//.style("top", (window.innerHeight/2 - 60) + "px")
+          d3.select("#control-container").style("left", (+svg_left.slice(0,-2) + svg_width) + "px")//.style("top", (window.innerHeight/2 + 80) + "px")
+          d3.select("#opp-space-tooltip-container").style("left", (+svg_left.slice(0,-2) + svg_width + 20) + "px")//.style("top", ((window.innerHeight/2 - 60)) + "px")
 
         var chartSVG = svg
           .append("g")
@@ -1697,7 +1698,6 @@
         d3.csv(
           "BNP Paribas Startups - Database.csv"
         ).then(function(data) {
-          console.log('data', data)
           d3.csv(
           "BNP Paribas Startups - Consolidated Tags + Definitions.csv"
           ).then(function(desc) {
@@ -1749,8 +1749,6 @@
                   return d['Consolidated Customer']
                 })
                 .entries(data);
-
-              console.log('customers', customers)
 
               customer_colors = ["#274C77", "#F5BB00", "#D75059", "#01AAFF", "#388659"]
 
@@ -6069,7 +6067,7 @@
             function labelMouseOut() {
               //d3.select("#label-mouse-over-text").remove();
               //d3.select("#hover-svg-background").remove();
-               d3.select("#opp-space-tooltip-container").style("display", "none")
+               //d3.select("#opp-space-tooltip-container").style("display", "none")
               segmentsLabelBand.attr("opacity", function(d) {
                 return d.opacity;
               });
